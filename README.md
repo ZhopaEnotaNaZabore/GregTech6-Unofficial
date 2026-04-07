@@ -1,4 +1,3 @@
-THIS IS UNNOFICAL FORK OF GREGTECH 6 U!
-DO NOT EXPECT ANYTHING FROM THIS,
+unnofical fork of gregtech6 unnofical. 
 //
-НЕ ЖДИТЕ НИЧЕГО ОТ ЭТОГО, ЭТО ДЛЯ ЛИЧНОГО ИСПОЛЬЗОВАНИЯ
+Для моего личного модпака!
