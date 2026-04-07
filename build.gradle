@@ -153,7 +153,7 @@ apply plugin: 'forge'
 //apply plugin: 'artemis-fluid'
 
 group = "com.gregoriust.gregtech"
-archivesBaseName = "gregtech_1.7.10"
+archivesBaseName = "gregtech_1.7.10-6.15.10_GMC.jar"
 version = "<UNKNOWN>"
 
 sourceCompatibility = 1.8

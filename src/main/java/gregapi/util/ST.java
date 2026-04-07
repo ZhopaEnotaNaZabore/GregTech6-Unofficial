@@ -344,7 +344,7 @@ public class ST {
 		ItemStack
 		rStack = GameRegistry.findItemStack(aModID.mID, aItem, (int)aSize);
 		if (valid(rStack)) return rStack;
-		if (aItem.length() < 5 || aItem.charAt(4) != '.' || !aItem.startsWith("tile")) return null;
+	if (aItem.length() < 5 || aItem.charAt(4) != '.' || !aItem.startsWith("tile")) return null;
 		return validate(GameRegistry.findItemStack(aModID.mID, aItem.substring(5), (int)aSize));
 	}
 	public static ItemStack mkic(String aItem, long aSize) {
