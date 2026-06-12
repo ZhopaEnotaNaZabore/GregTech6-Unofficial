@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2019 Gregorius Techneticies
  *
  * This file is part of GregTech.
  *

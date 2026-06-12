@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2020 GregTech-6 Team
  *
  * This file is part of GregTech.
  *
@@ -41,14 +41,11 @@ public class FluidTankGT implements IFluidTank {
 	/** HashMap of adjustable Tank Sizes based on Fluids if needed. */
 	private Map<String, Long> mAdjustableCapacity = null;
 	private long mAdjustableMultiplier = 1;
-	/** Gives you a Tank Index in case there is multiple Tanks on a TileEntity that cares. */
-	public int mIndex = 0;
 	
-	public FluidTankGT() {mCapacity = Long.MAX_VALUE;}
-	public FluidTankGT(long aCapacity) {mCapacity = aCapacity;}
 	public FluidTankGT(FluidStack aFluid) {mFluid = aFluid; if (aFluid != null) {mCapacity = aFluid.amount; mAmount = aFluid.amount;}}
 	public FluidTankGT(FluidStack aFluid, long aCapacity) {mFluid = aFluid; mCapacity = aCapacity; mAmount = (aFluid == null ? 0 : aFluid.amount);}
 	public FluidTankGT(FluidStack aFluid, long aAmount, long aCapacity) {mFluid = aFluid; mCapacity = aCapacity; mAmount = (aFluid == null ? 0 : aAmount);}
+	public FluidTankGT(long aCapacity) {mCapacity = aCapacity;}
 	public FluidTankGT(Fluid aFluid, long aAmount) {this(FL.make(aFluid, aAmount)); mAmount = aAmount;}
 	public FluidTankGT(Fluid aFluid, long aAmount, long aCapacity) {this(FL.make(aFluid, aAmount), aCapacity); mAmount = aAmount;}
 	public FluidTankGT(NBTTagCompound aNBT, long aCapacity) {mCapacity = aCapacity; if (aNBT != null && !aNBT.hasNoTags()) {mFluid = FL.load_(aNBT); mAmount = (isEmpty() ? 0 : aNBT.hasKey("LAmount") ? aNBT.getLong("LAmount") : mFluid.amount);}}
@@ -116,11 +113,11 @@ public class FluidTankGT implements IFluidTank {
 		if (aDoDrain) {
 			mAmount -= aDrained;
 			if (mAmount <= 0) {
-				if (mPreventDraining) {
-					mAmount = 0;
-				} else {
-					setEmpty();
+				if (!mPreventDraining) {
+					mFluid = null;
+					mChangedFluids = T;
 				}
+				mAmount = 0;
 			}
 		}
 		return rFluid;
@@ -130,11 +127,11 @@ public class FluidTankGT implements IFluidTank {
 		if (isEmpty() || mAmount < aDrained) return F;
 		mAmount -= aDrained;
 		if (mAmount <= 0) {
-			if (mPreventDraining) {
-				mAmount = 0;
-			} else {
-				setEmpty();
+			if (!mPreventDraining) {
+				mFluid = null;
+				mChangedFluids = T;
 			}
+			mAmount = 0;
 		}
 		return T;
 	}
@@ -144,11 +141,11 @@ public class FluidTankGT implements IFluidTank {
 		if (mAmount < aDrained) aDrained = mAmount;
 		mAmount -= aDrained;
 		if (mAmount <= 0) {
-			if (mPreventDraining) {
-				mAmount = 0;
-			} else {
-				setEmpty();
+			if (!mPreventDraining) {
+				mFluid = null;
+				mChangedFluids = T;
 			}
+			mAmount = 0;
 		}
 		return aDrained;
 	}
@@ -255,16 +252,12 @@ public class FluidTankGT implements IFluidTank {
 		return F;
 	}
 	
-	/** Resets Tank Contents entirely */
+	/** Resets the Tank Contents entirely */
 	public FluidTankGT setEmpty() {mFluid = null; mChangedFluids = T; mAmount = 0; return this;}
 	/** Sets Fluid Content, taking Amount from the Fluid Parameter  */
 	public FluidTankGT setFluid(FluidStack aFluid) {mFluid = aFluid; mChangedFluids = T; mAmount = (aFluid == null ? 0 : aFluid.amount); return this;}
 	/** Sets Fluid Content and Amount */
 	public FluidTankGT setFluid(FluidStack aFluid, long aAmount) {mFluid = aFluid; mChangedFluids = T; mAmount = (aFluid == null ? 0 : aAmount); return this;}
-	/** Sets Fluid Content, taking Amount from the Tank Parameter  */
-	public FluidTankGT setFluid(FluidTankGT aTank) {mFluid = FL.amount(aTank.mFluid, aTank.mAmount); mChangedFluids = T; mAmount = aTank.mAmount; return this;}
-	/** Sets the Tank Index for easier Reverse Mapping. */
-	public FluidTankGT setIndex(int aIndex) {mIndex = aIndex; return this;}
 	/** Sets the Capacity, and yes it accepts 63 Bit Numbers */
 	public FluidTankGT setCapacity(long aCapacity) {if (aCapacity >= 0) mCapacity = aCapacity; return this;}
 	/** Always keeps at least 0 Liters of Fluid instead of setting it to null */
@@ -313,8 +306,8 @@ public class FluidTankGT implements IFluidTank {
 	public String name(boolean aLocalised) {return FL.name(mFluid, aLocalised);}
 	
 	public String content() {return content("Empty");}
-	public String content(String aEmptyMessage) {return  mFluid == null ? aEmptyMessage : UT.Code.makeString(amount()) + " L of " + name(T) + " (" + (FL.gas(mFluid) ? "Gaseous" : "Liquid") + ")";}
-	public String contentcap() {return mFluid == null ? "Capacity: " + mCapacity + " L" : UT.Code.makeString(amount()) + " L of " + name(T) + " (" + (FL.gas(mFluid) ? "Gaseous" : "Liquid") + "); Max: "+UT.Code.makeString(capacity())+" L)";}
+	public String content(String aEmptyMessage) {return  mFluid == null ? aEmptyMessage : amount() + " L of " + name(T) + " (" + (FL.gas(mFluid) ? "Gaseous" : "Liquid") + ")";}
+	public String contentcap() {return mFluid == null ? "Capacity: " + mCapacity + " L" : amount() + " L of " + name(T) + " (" + (FL.gas(mFluid) ? "Gaseous" : "Liquid") + "); Max: "+capacity()+" L)";}
 	
 	public Fluid fluid() {return mFluid == null ? null : mFluid.getFluid();}
 	

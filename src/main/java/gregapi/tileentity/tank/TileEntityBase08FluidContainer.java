@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2019 Gregorius Techneticies
  *
  * This file is part of GregTech.
  *
@@ -137,7 +137,7 @@ public abstract class TileEntityBase08FluidContainer extends TileEntityBase07Pai
 			return GarbageGT.trash(mTank, 1000);
 		}
 		if (aTool.equals(TOOL_magnifyingglass)) {
-			if (aChatReturn != null) aChatReturn.add(mTank.contentcap());
+			if (aChatReturn != null) aChatReturn.add(mTank.content());
 			return 1;
 		}
 		return 0;
@@ -168,8 +168,8 @@ public abstract class TileEntityBase08FluidContainer extends TileEntityBase07Pai
 				case eat: UT.Sounds.send(worldObj, SFX.MC_EAT  , 1.0F, 1.0F, getCoords()); break;
 				default : UT.Sounds.send(worldObj, SFX.MC_DRINK, 1.0F, 1.0F, getCoords()); break;
 				}
-				mTank.remove(250);
 				aStack.getItem().onEaten(aStack, worldObj, aPlayer);
+				mTank.remove(250);
 			}
 		}
 		return T;
@@ -315,9 +315,9 @@ public abstract class TileEntityBase08FluidContainer extends TileEntityBase07Pai
 					return aStack;
 				}
 				
-				tTarget.blockX+=OFFX[tTarget.sideHit];
-				tTarget.blockY+=OFFY[tTarget.sideHit];
-				tTarget.blockZ+=OFFZ[tTarget.sideHit];
+				tTarget.blockX+=OFFSETS_X[tTarget.sideHit];
+				tTarget.blockY+=OFFSETS_Y[tTarget.sideHit];
+				tTarget.blockZ+=OFFSETS_Z[tTarget.sideHit];
 				tBlock = aWorld.getBlock(tTarget.blockX, tTarget.blockY, tTarget.blockZ);
 				
 				if (tBlock instanceof IFluidBlock) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2020 GregTech-6 Team
  *
  * This file is part of GregTech.
  *
@@ -64,7 +64,7 @@ public class MultiTileEntityStorageInserter extends TileEntityBase07Paintable im
 			if (tOnlyHand && aPlayer.inventory.getCurrentItem() == null) break;
 			tryInsert(aPlayer, tTileEntity, tOnlyHand);
 		}
-		ST.update(aPlayer);
+		if (aPlayer.openContainer != null) aPlayer.openContainer.detectAndSendChanges();
 		return T;
 	}
 	
@@ -75,11 +75,11 @@ public class MultiTileEntityStorageInserter extends TileEntityBase07Paintable im
 			Block tBlock = WD.block(worldObj, aX, aY+i, aZ);
 			if (tBlock.getMaterial() != Material.carpet && WD.hasCollide(worldObj, aX, aY+i, aZ, tBlock)) break;
 			for (byte tSide : ALL_SIDES_HORIZONTAL) {
-				TileEntity tTileEntity = getTileEntity(aX+OFFX[tSide], aY+i, aZ+OFFZ[tSide]);
+				TileEntity tTileEntity = getTileEntity(aX+OFFSETS_X[tSide], aY+i, aZ+OFFSETS_Z[tSide]);
 				if (tTileEntity instanceof MultiTileEntityStorageInserter) {
 					temp = F;
 				} else if (tTileEntity instanceof MultiTileEntityMassStorage) {
-					if (((MultiTileEntityMassStorage)tTileEntity).mFacing == OPOS[tSide]) {
+					if (((MultiTileEntityMassStorage)tTileEntity).mFacing == OPPOSITES[tSide]) {
 						temp = F;
 						if (((MultiTileEntityMassStorage)tTileEntity).slotHas(1)) {
 							tryInsert(aPlayer, (MultiTileEntityMassStorage)tTileEntity, aOnlyHand);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2019 Gregorius Techneticies
  *
  * This file is part of GregTech.
  *
@@ -34,7 +34,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
 /**
@@ -43,18 +42,15 @@ import net.minecraftforge.common.ChestGenHooks;
 public class ChestGenHooksChestReplacer extends ChestGenHooks {
 	public final ChestGenHooks mHookToReplaceChestsOf;
 	public final String mCategory;
-	public final short mChestID;
 	
 	// MineTweaker does Reflection the wrong way...
 	@SuppressWarnings("rawtypes")
 	public ArrayList contents;
 	
-	public ChestGenHooksChestReplacer(String aCategory) {this(aCategory, (short)32745);}
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public ChestGenHooksChestReplacer(String aCategory, long aChestID) {
+	public ChestGenHooksChestReplacer(String aCategory) {
 		super(aCategory);
 		mCategory = aCategory;
-		mChestID = (short)aChestID;
 		mHookToReplaceChestsOf = ChestGenHooks.getInfo(aCategory);
 		super.setMin(mHookToReplaceChestsOf.getMin());
 		super.setMax(mHookToReplaceChestsOf.getMax());
@@ -74,7 +70,7 @@ public class ChestGenHooksChestReplacer extends ChestGenHooks {
 	public WeightedRandomChestContent[] getItems(Random aRandom) {
 		WeightedRandomChestContent[] rReturn = mHookToReplaceChestsOf.getItems(aRandom);
 		if (GAPI.mStartedServerStarted < 1 || aRandom == RNGSUS) return rReturn;
-		for (int i = 0; i < rReturn.length; i++) rReturn[i] = new WeightedRandomChestContentChestReplacer(rReturn[i], mCategory, mChestID);
+		for (int i = 0; i < rReturn.length; i++) rReturn[i] = new WeightedRandomChestContentChestReplacer(rReturn[i], mCategory);
 		return rReturn;
 	}
 	
@@ -90,37 +86,19 @@ public class ChestGenHooksChestReplacer extends ChestGenHooks {
 	public static class WeightedRandomChestContentChestReplacer extends WeightedRandomChestContent {
 		public final WeightedRandomChestContent mContent;
 		public final String mCategory;
-		public final short mChestID;
 		
-		public WeightedRandomChestContentChestReplacer(WeightedRandomChestContent aContent, String aCategory, short aChestID) {
+		public WeightedRandomChestContentChestReplacer(WeightedRandomChestContent aContent, String aCategory) {
 			super(aContent.theItemId, aContent.theMinimumChanceToGenerateItem, aContent.theMaximumChanceToGenerateItem, aContent.itemWeight);
 			mCategory = aCategory;
 			mContent = aContent;
-			mChestID = aChestID;
 		}
 		
 		@Override
 		protected ItemStack[] generateChestContent(Random aRandom, IInventory aInventory) {
-			// Only unmodified Vanilla Chests!
-			if (aInventory.getClass() != TileEntityChest.class) return generateChestContent2(aRandom, aInventory);
-			// We need a World Object.
-			World aWorld = ((TileEntityChest)aInventory).getWorldObj();
-			if (aWorld == null) return generateChestContent2(aRandom, aInventory);
-			// XYZ and check if the Block we replace is a regular Chest.
-			int aX = ((TileEntityChest)aInventory).xCoord, aY = ((TileEntityChest)aInventory).yCoord, aZ = ((TileEntityChest)aInventory).zCoord;
-			if (Blocks.chest != aWorld.getBlock(aX, aY, aZ)) return generateChestContent2(aRandom, aInventory);
-			// Does my Registry exist?
+			if (aInventory.getClass() != TileEntityChest.class || ((TileEntityChest)aInventory).getWorldObj() == null || Blocks.chest != ((TileEntityChest)aInventory).getWorldObj().getBlock(((TileEntityChest)aInventory).xCoord, ((TileEntityChest)aInventory).yCoord, ((TileEntityChest)aInventory).zCoord)) return generateChestContent2(aRandom, aInventory);
 			MultiTileEntityRegistry tRegistry = MultiTileEntityRegistry.getRegistry("gt.multitileentity");
 			if (tRegistry == null) return generateChestContent2(aRandom, aInventory);
-			// Grab the Chests Facing.
-			int tFacing = VALIDATE_HORIZONTAL[aWorld.getBlockMetadata(aX, aY, aZ)];
-			// Erase the Chest with a Block Update.
-			aWorld.setBlock(aX, aY, aZ, NB, 0, 1);
-			// Erase it again just to fucking make sure!
-			aWorld.setBlock(aX, aY, aZ, NB, 0, 1);
-			// Place the better Loot Chest.
-			tRegistry.mBlock.placeBlock(aWorld, aX, aY, aZ, SIDE_UNKNOWN, mChestID, UT.NBT.make(NBT_FACING, tFacing, "gt.dungeonloot", mCategory), F, T);
-			// Loot wont need to be generated anymore in that case.
+			tRegistry.mBlock.placeBlock(((TileEntityChest)aInventory).getWorldObj(), ((TileEntityChest)aInventory).xCoord, ((TileEntityChest)aInventory).yCoord, ((TileEntityChest)aInventory).zCoord, SIDE_UNKNOWN, (short)32745, UT.NBT.make(NBT_FACING, VALIDATE_HORIZONTAL[((TileEntityChest)aInventory).getWorldObj().getBlockMetadata(((TileEntityChest)aInventory).xCoord, ((TileEntityChest)aInventory).yCoord, ((TileEntityChest)aInventory).zCoord)], "gt.dungeonloot", mCategory), F, T);
 			return ZL_IS;
 		}
 		

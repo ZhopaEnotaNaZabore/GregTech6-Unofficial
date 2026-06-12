@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2019 Gregorius Techneticies
  *
  * This file is part of GregTech.
  *
@@ -125,16 +125,13 @@ public class CR {
 			if (tRecipe != null) {
 				if (tRecipe instanceof ICraftingRecipeGT && !((ICraftingRecipeGT)tRecipe).isRemovableByGT()) continue;
 				if (CLASSES_SPECIAL.contains(tRecipe.getClass().getName())) continue;
-				if (RECIPES_TO_DELATE.contains(tRecipe.getRecipeOutput(), T)) tList.set(i, null);
+				if (RECIPES_TO_DELATE.contains(tRecipe.getRecipeOutput(), T)) tList.remove(i--);
 			}
 		}
-		tList.removeAll(Arrays.asList((IRecipe)null));
 		// This setting is not meant to speed up load times, its meant to just make Crafting Recipes less visible in NEI
 		if (!DISABLE_GT6_CRAFTING_RECIPES) for (IRecipe tRecipe : BUFFER) GameRegistry.addRecipe(tRecipe);
 		BUFFER.clear();
 	}
-	
-	public static final String DELATE = "gt:delate";
 	
 	public static final long NONE = 0;
 	/** Mirrors the Recipe */
@@ -270,7 +267,6 @@ public class CR {
 	 * , 'd' = OreDictToolNames.screwdriver
 	 * , 'e' = OreDictToolNames.drill
 	 * , 'f' = OreDictToolNames.file
-	 * , 'g' = OreDictToolNames.handdrill
 	 * , 'h' = OreDictToolNames.hammer
 	 * , 'i' = OreDictToolNames.solderingiron
 	 * , 'j' = OreDictToolNames.solderingmetal
@@ -316,19 +312,17 @@ public class CR {
 		boolean tThereWasARecipe = F;
 		
 		aResult = ST.validMeta(OM.get(aResult));
-		for (byte i = 0; i < aRecipe.length; i++) if (aRecipe[i] != null) {
-			if (aRecipe[i] instanceof IItemContainer) {
+		for (byte i = 0; i < aRecipe.length; i++) {
+			if (aRecipe[i] instanceof IItemContainer)
 				aRecipe[i] = ((IItemContainer)aRecipe[i]).get(1);
-				if (aRecipe[i] == null) return F;
-			} else if (aRecipe[i] instanceof Enum) {
+			else if (aRecipe[i] instanceof Enum)
 				aRecipe[i] = ((Enum<?>)aRecipe[i]).name();
-			} else if (aRecipe[i] instanceof Item) {
+			else if (aRecipe[i] instanceof Item)
 				aRecipe[i] = ST.make((Item)aRecipe[i], 1, W);
-			} else if (aRecipe[i] instanceof Block) {
+			else if (aRecipe[i] instanceof Block)
 				aRecipe[i] = ST.make((Block)aRecipe[i], 1, W);
-			} else if (!(aRecipe[i] instanceof ItemStack || aRecipe[i] instanceof OreDictItemData || aRecipe[i] instanceof String || aRecipe[i] instanceof Character)) {
+			else if (!(aRecipe[i] == null || aRecipe[i] instanceof ItemStack || aRecipe[i] instanceof OreDictItemData || aRecipe[i] instanceof String || aRecipe[i] instanceof Character))
 				aRecipe[i] = aRecipe[i].toString();
-			}
 		}
 		
 		try {
@@ -352,7 +346,6 @@ public class CR {
 					case 'd': tRecipeList.add(c); tRecipeList.add(OreDictToolNames.screwdriver              ); break;
 					case 'e': tRecipeList.add(c); tRecipeList.add(OreDictToolNames.drill                    ); break;
 					case 'f': tRecipeList.add(c); tRecipeList.add(OreDictToolNames.file                     ); break;
-					case 'g': tRecipeList.add(c); tRecipeList.add(OreDictToolNames.handdrill                ); break;
 					case 'h': tRecipeList.add(c); tRecipeList.add(OreDictToolNames.hammer                   ); break;
 					case 'i': tRecipeList.add(c); tRecipeList.add(OreDictToolNames.solderingiron            ); break;
 					case 'j': tRecipeList.add(c); tRecipeList.add(OreDictToolNames.solderingmetal           ); break;
@@ -383,8 +376,10 @@ public class CR {
 			
 			for (; idx < aRecipe.length; idx += 2) {
 				if (aRecipe[idx] == null || aRecipe[idx + 1] == null) {
-					ERR.println("WARNING: Missing Item for shaped Recipe: " + (aResult==null?"null":aResult.getDisplayName()));
-					for (Object tContent : aRecipe) ERR.println(tContent);
+					if (D1) {
+						ERR.println("WARNING: Missing Item for shaped Recipe: " + (aResult==null?"null":aResult.getDisplayName()));
+						for (Object tContent : aRecipe) ERR.println(tContent);
+					}
 					return F;
 				}
 				
@@ -470,26 +465,24 @@ public class CR {
 		if (aRecipe.length > 9) throw new IllegalArgumentException("Shapeless Recipe has more than 9 Inputs! This would crash NEI!");
 		
 		aResult = ST.validMeta(OM.get(aResult));
-		for (byte i = 0; i < aRecipe.length; i++) if (aRecipe[i] != null) {
-			if (aRecipe[i] instanceof IItemContainer) {
+		for (byte i = 0; i < aRecipe.length; i++) {
+			if (aRecipe[i] instanceof IItemContainer)
 				aRecipe[i] = ((IItemContainer)aRecipe[i]).get(1);
-				if (aRecipe[i] == null) return F;
-			} else if (aRecipe[i] instanceof Enum) {
+			else if (aRecipe[i] instanceof Enum)
 				aRecipe[i] = ((Enum<?>)aRecipe[i]).name();
-			} else if (aRecipe[i] instanceof Item) {
+			else if (aRecipe[i] instanceof Item)
 				aRecipe[i] = ST.make((Item)aRecipe[i], 1, W);
-			} else if (aRecipe[i] instanceof Block) {
+			else if (aRecipe[i] instanceof Block)
 				aRecipe[i] = ST.make((Block)aRecipe[i], 1, W);
-			} else if (!(aRecipe[i] instanceof ItemStack || aRecipe[i] instanceof String || aRecipe[i] instanceof Character)) {
+			else if (!(aRecipe[i] == null || aRecipe[i] instanceof ItemStack || aRecipe[i] instanceof String || aRecipe[i] instanceof Character))
 				aRecipe[i] = aRecipe[i].toString();
-			}
 		}
 		try {
 			ItemStack[] tRecipe = new ItemStack[9];
 			int i = 0;
 			for (Object tObject : aRecipe) {
 				if (tObject == null) {
-					ERR.println("WARNING: Missing Item for shapeless Recipe: " + (aResult==null?"null":aResult.getDisplayName()));
+					if (D1) ERR.println("WARNING: Missing Item for shapeless Recipe: " + (aResult==null?"null":aResult.getDisplayName()));
 					for (Object tContent : aRecipe) ERR.println(tContent);
 					return F;
 				}
@@ -524,18 +517,18 @@ public class CR {
 	}
 	
 	public static IRecipe sLastRecipe = null;
-
-	/** Checks all Crafting Handlers for Recipe Output */
-	public static ItemStack getany(World aWorld, ItemStack... aRecipe) {return getany(aWorld, T, aRecipe);}
-	/** Checks all Crafting Handlers for Recipe Output */
-	public static ItemStack getany(World aWorld, boolean aAllowCache, ItemStack... aRecipe) {
+	
+	/**
+	 * Checks all Crafting Handlers for Recipe Output
+	 */
+	public static ItemStack getany(World aWorld, ItemStack... aRecipe) {
 		if (!ST.hasValid(aRecipe)) return null;
 		
 		if (aWorld == null) aWorld = CS.DW;
 		
 		InventoryCrafting aCrafting = crafting(aRecipe);
 		
-		if (aAllowCache && sLastRecipe != null && sLastRecipe.matches(aCrafting, aWorld)) return sLastRecipe.getCraftingResult(aCrafting);
+		if (sLastRecipe != null && sLastRecipe.matches(aCrafting, aWorld)) return sLastRecipe.getCraftingResult(aCrafting);
 		
 		List<IRecipe> tList = list();
 		for (int i = 0; i < tList.size(); i++) if (tList.get(i).matches(aCrafting, aWorld)) return (sLastRecipe = tList.get(i)).getCraftingResult(aCrafting);

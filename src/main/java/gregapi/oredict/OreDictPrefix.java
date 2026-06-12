@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2020 GregTech-6 Team
  *
  * This file is part of GregTech.
  *
@@ -124,7 +124,7 @@ public final class OreDictPrefix implements IOreDictListenerEvent, ITagDataConta
 			}
 		}
 		sPrefixes.put(mNameInternal, this);
-		mFamiliarPrefixes.add(this);
+		addFamiliarPrefix(this);
 	}
 	
 	public static OreDictPrefix get(String aOre) {
@@ -151,9 +151,6 @@ public final class OreDictPrefix implements IOreDictListenerEvent, ITagDataConta
 	public OreDictPrefix addFamiliarPrefix(OreDictPrefix aPrefix) {
 		mFamiliarPrefixes.add(aPrefix);
 		return this;
-	}
-	public OreDictPrefix addFamiliarPrefixWithReversal(OreDictPrefix aPrefix) {
-		return addFamiliarPrefix(aPrefix.addFamiliarPrefix(this));
 	}
 	
 	/** The Re-Registration for the Ore Dictionary for invalid Prefixes */
@@ -461,7 +458,7 @@ public final class OreDictPrefix implements IOreDictListenerEvent, ITagDataConta
 					tListener.onOreRegistration(aEvent);
 				}
 				mRegistrations.add(aEvent);
-				if (!mRegisteredItems.contains(new ItemStackContainer(aEvent.mStack, W))) mRegisteredItems.add(aEvent.mStack);
+				if (!mRegisteredItems.contains(new ItemStackContainer(aEvent.mStack, W))) mRegisteredItems.add(new ItemStackContainer(aEvent.mStack));
 			}
 		} else {
 			if (!mIgnoredRegistrations.contains(aEvent.mMaterial)) {
@@ -487,7 +484,7 @@ public final class OreDictPrefix implements IOreDictListenerEvent, ITagDataConta
 				}
 				aEvent.mMaterial.mRegisteredItems.add(new ItemStackContainer(aEvent.mStack));
 				mRegisteredMaterials.add(aEvent.mMaterial);
-				if (!mRegisteredItems.contains(new ItemStackContainer(aEvent.mStack, W))) mRegisteredItems.add(aEvent.mStack);
+				if (!mRegisteredItems.contains(new ItemStackContainer(aEvent.mStack, W))) mRegisteredItems.add(new ItemStackContainer(aEvent.mStack));
 			}
 		}
 	}
@@ -499,7 +496,7 @@ public final class OreDictPrefix implements IOreDictListenerEvent, ITagDataConta
 	/** This is used to determine if any of the ItemStacks belongs to this Prefix. */
 	public boolean contains(ItemStack... aStacks) {
 		if (aStacks == null) return F;
-		for (ItemStack aStack : aStacks) if (ST.valid(aStack) && mRegisteredItems.contains(aStack, T)) return T;
+		for (ItemStack aStack : aStacks) if (mRegisteredItems.contains(aStack, T)) return T;
 		return F;
 	}
 	

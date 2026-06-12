@@ -50,6 +50,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
@@ -107,7 +108,7 @@ public abstract class TileEntityBase08Battery extends TileEntityBase07Paintable 
 	
 	@Override
 	public void addToolTips(List<String> aList, ItemStack aStack, boolean aF3_H) {
-		aList.add(LH.Chat.WHITE + UT.Code.makeString(Math.min(mCapacity, mEnergy)) + " / " + UT.Code.makeString(mCapacity) + " " + mType.getChatFormat() + mType.getLocalisedNameShort() + LH.Chat.WHITE + " - Size: " + mSizeRec);
+		aList.add(LH.Chat.WHITE + UT.Code.makeString(Math.min(mCapacity, mEnergy)) + " / " + UT.Code.makeString(mCapacity) + " " + mType.getChatFormat() + mType.getLocalisedNameShort() + LH.Chat.WHITE + " - Size: " + mSizeRec + EnumChatFormatting.GRAY);
 	}
 	
 	@Override
@@ -177,15 +178,15 @@ public abstract class TileEntityBase08Battery extends TileEntityBase07Paintable 
 	public ItemStack rechargeFromPlayer(TagData aEnergyType, ItemStack aStack, EntityLivingBase aPlayer, IInventory aInventory, World aWorld, int aX, int aY, int aZ) {
 		if (COMPAT_EU_ITEM == null || aPlayer == null || aPlayer.worldObj.isRemote || aEnergyType != mType || aEnergyType != TD.Energy.EU) return aStack;
 		long tMinInput = getEnergySizeInputMin(aEnergyType, aStack);
-		boolean temp = F;
 		try {for (int i = 1; i < 5; i++) {
 			if (mEnergy >= mCapacity) return aStack;
 			ItemStack tArmor = aPlayer.getEquipmentInSlot(i);
 			if (tArmor == aStack || ST.invalid(tArmor) || !COMPAT_EU_ITEM.is(tArmor) || VMAX[COMPAT_EU_ITEM.tier(tArmor)] < tMinInput || !COMPAT_EU_ITEM.provider(tArmor)) continue;
 			setEnergyStored(aEnergyType, aStack, mEnergy+COMPAT_EU_ITEM.decharge(tArmor, mCapacity-mEnergy, T));
-			temp = T;
 		}} catch(Throwable e) {e.printStackTrace(ERR);}
-		if (temp) ST.update(aPlayer);
+		if (aPlayer instanceof EntityPlayer) {
+			if (((EntityPlayer)aPlayer).openContainer != null) ((EntityPlayer)aPlayer).openContainer.detectAndSendChanges();
+		}
 		return aStack;
 	}
 	

@@ -162,8 +162,6 @@ public abstract class MultiTileEntityReactorCore extends TileEntityBase10FacingD
 		return false;
 	}
 
-	public void updateReactorRodModeration(int aSlot) {/**/}
-
 	public int getReactorRodNeutronEmission(int aSlot) {
 		return 0;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2020 GregTech-6 Team
  *
  * This file is part of GregTech.
  *
@@ -25,12 +25,10 @@ import java.util.Collection;
 import java.util.List;
 
 import gregapi.code.ArrayListNoNulls;
-import gregapi.code.ItemStackContainer;
 import gregapi.code.TagData;
 import gregapi.data.ANY;
 import gregapi.data.CS.BlocksGT;
 import gregapi.data.CS.FluidsGT;
-import gregapi.data.CS.GarbageGT;
 import gregapi.data.IL;
 import gregapi.data.LH;
 import gregapi.data.LH.Chat;
@@ -50,11 +48,8 @@ import gregapi.tileentity.multiblocks.TileEntityBase10MultiBlockBase;
 import gregapi.util.ST;
 import gregapi.util.UT;
 import gregapi.util.WD;
-import gregapi.worldgen.StoneLayer;
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.FluidStack;
@@ -150,7 +145,7 @@ public class MultiTileEntityBedrockDrill extends TileEntityBase10MultiBlockBase 
 			}
 			if (mEnergy >= 32768 && !slotHas(0) && checkStructure(F) && mTank.drainAll(100)) {
 				mEnergy -= 32768;
-				// Switch Stone Type randomly. The plus 1 is for the Vanilla Stone case.
+				// Switch Stone Type randomly.
 				if (rng(1000) == 0) mType = rng(BlocksGT.stones.length+1);
 				// a 0-18 of 128 Chance to be an Ore.
 				int tSelector = rng(128);
@@ -172,33 +167,25 @@ public class MultiTileEntityBedrockDrill extends TileEntityBase10MultiBlockBase 
 						slot(0, ST.make((Block)BlocksGT.oreBrokenNetherrack, 1, tMaterial.mID));
 					} else if (WD.dimERE(worldObj)) {
 						// Erebus Umberstone Ore.
-						Object tBlock = BlocksGT.stoneToBrokenOres.get(new ItemStackContainer(IL.ERE_Umberstone.get(1)));
-						slot(0, ST.make((Block)(tBlock instanceof Block ? tBlock : BlocksGT.oreBroken), 1, tMaterial.mID));
+						slot(0, ST.make((Block)BlocksGT.oreBroken, 1, tMaterial.mID)); // TODO actually get the right Ore Block.
 					} else if (WD.dimATUM(worldObj)) {
 						// Atum Limestone Ore.
-						Object tBlock = BlocksGT.stoneToBrokenOres.get(new ItemStackContainer(IL.ATUM_Limestone.get(1)));
-						slot(0, ST.make((Block)(tBlock instanceof Block ? tBlock : BlocksGT.oreBroken), 1, tMaterial.mID));
+						slot(0, ST.make((Block)BlocksGT.oreBrokenAtumLimestone, 1, tMaterial.mID));
 					} else if (WD.dimBTL(worldObj)) {
 						// Betweenlands Stone Ores.
-						Object tBlock = BlocksGT.stoneToBrokenOres.get(new ItemStackContainer((mType%2==0?IL.BTL_Pitstone:IL.BTL_Betweenstone).get(1)));
-						slot(0, ST.make((Block)(tBlock instanceof Block ? tBlock : BlocksGT.oreBroken), 1, tMaterial.mID));
-					} else if (mType < BlocksGT.stones.length) {
-						// This might be the Overworld or some Overworld alike Dimension.
-						slot(0, ST.make((Block)BlocksGT.ores_broken[mType], 1, tMaterial.mID));
-					}
-					if (ST.invalid(slot(0)) && StoneLayer.DEEPSLATE != null) {
-						// Make Deepslate Ore before Cobblestone.
-						slot(0, ST.make((Block)StoneLayer.DEEPSLATE.mOreBroken, 1, tMaterial.mID));
-					}
-					if (ST.invalid(slot(0))) {
-						// Make Vanilla Stone Ore, if nothing else applies.
+						slot(0, ST.make((Block)BlocksGT.oreBroken, 1, tMaterial.mID)); // TODO actually get the right Ore Block.
+					} else if (mType <= 0 || mType > BlocksGT.stones.length) {
+						// Index is 0 or there is a Boundary Error for some reason? Well use Vanilla Stone Ore in that case. 
 						slot(0, ST.make((Block)BlocksGT.oreBroken, 1, tMaterial.mID));
+					} else {
+						// This might be the Overworld or some Overworld alike Dimension.
+						slot(0, ST.make((Block)BlocksGT.ores_broken[mType-1], 1, tMaterial.mID));
 					}
 				} else {
 					// Select a Stone to generate.
 					if (rng(1000) == 0) {
 						// 0.1% Chance to get Bedrock Dust. Only really useful for the Byproducts it has, and Rotarycraft.
-						slot(0, OP.dust.mat(MT.Bedrock, 1));
+						slot(0, OP.dustImpure.mat(MT.Bedrock, 1));
 					} else if (worldObj.provider.dimensionId == DIM_NETHER) {
 						// Netherrack.
 						slot(0, ST.make(Blocks.netherrack, 1, 0));
@@ -206,38 +193,21 @@ public class MultiTileEntityBedrockDrill extends TileEntityBase10MultiBlockBase 
 						// Erebus Umberstone.
 						slot(0, IL.ERE_Umbercobble.get(1));
 					} else if (WD.dimATUM(worldObj)) {
-						// Atum Limestone.
-						slot(0, IL.ATUM_Limecobble.get(1));
+						// Yep, it makes GT6 Limestone, not Atums.
+						slot(0, ST.make(BlocksGT.Limestone, 1, 1));
 					} else if (WD.dimBTL(worldObj)) {
 						// Betweenlands Stones.
 						slot(0, (mType%2==0?IL.BTL_Pitstone:IL.BTL_Betweenstone).get(1));
-					} else if (mType < BlocksGT.stones.length) {
-						// This might be the Overworld or some Overworld alike Dimension.
-						slot(0, ST.make(BlocksGT.stones[mType], 1, 1));
-					}
-					if (ST.invalid(slot(0)) && StoneLayer.DEEPSLATE != null) {
-						// Make Deepslate before Cobblestone.
-						slot(0, ST.make(StoneLayer.DEEPSLATE.mCobble, 1, StoneLayer.DEEPSLATE.mMetaCobble));
-					}
-					if (ST.invalid(slot(0))) {
-						// Make Cobble, if nothing else applies.
+					} else if (mType <= 0 || mType > BlocksGT.stones.length) {
+						// Index is 0 or there is a Boundary Error for some reason? Well use Vanilla Stone in that case. 
 						slot(0, ST.make(Blocks.cobblestone, 1, 0));
+					} else {
+						// This might be the Overworld or some Overworld alike Dimension.
+						slot(0, ST.make(BlocksGT.stones[mType-1], 1, 1));
 					}
 				}
 			}
 		}
-	}
-	
-	@Override
-	public long onToolClick2(String aTool, long aRemainingDurability, long aQuality, Entity aPlayer, List<String> aChatReturn, IInventory aPlayerInventory, boolean aSneaking, ItemStack aStack, byte aSide, float aHitX, float aHitY, float aHitZ) {
-		long rReturn = super.onToolClick2(aTool, aRemainingDurability, aQuality, aPlayer, aChatReturn, aPlayerInventory, aSneaking, aStack, aSide, aHitX, aHitY, aHitZ);
-		if (rReturn > 0) return rReturn;
-		
-		if (isClientSide()) return 0;
-		
-		if (aTool.equals(TOOL_plunger)) return GarbageGT.trash(mTank);
-		
-		return 0;
 	}
 	
 	@Override

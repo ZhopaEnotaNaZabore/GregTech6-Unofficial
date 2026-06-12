@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2019 Gregorius Techneticies
  *
  * This file is part of GregTech.
  *
@@ -26,8 +26,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 import gregapi.data.LH;
 import gregapi.item.multiitem.MultiItem;
 import gregapi.item.multiitem.behaviors.IBehavior.AbstractBehaviorDefault;
+import gregapi.util.ST;
 import gregapi.util.UT;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
@@ -37,7 +39,12 @@ public class Behavior_WrittenBook extends AbstractBehaviorDefault {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public ItemStack onItemRightClick(MultiItem aItem, ItemStack aStack, World aWorld, EntityPlayer aPlayer) {
-		UT.Books.display(aPlayer, aStack);
+		String aMapping = UT.NBT.getBookMapping(aStack);
+		if (UT.Code.stringValid(aMapping)) {
+			aPlayer.displayGUIBook(UT.Books.getWrittenBook(aMapping, ST.make(Items.written_book, 1, 0)));
+		} else {
+			if (UT.Code.stringValid(UT.NBT.getBookTitle(aStack))) aPlayer.displayGUIBook(ST.make(Items.written_book, 1, 0, aStack.getTagCompound()));
+		}
 		return super.onItemRightClick(aItem, aStack, aWorld, aPlayer);
 	}
 	

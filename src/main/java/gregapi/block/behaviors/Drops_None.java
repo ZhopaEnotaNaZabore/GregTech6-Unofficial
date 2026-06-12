@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2019 Gregorius Techneticies
  *
  * This file is part of GregTech.
  *
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import gregapi.block.prefixblock.PrefixBlock;
 import gregapi.code.ArrayListNoNulls;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -32,7 +33,7 @@ import net.minecraft.world.World;
  */
 public class Drops_None extends Drops {
 	public Drops_None() {
-		super(0, 0);
+		super((Item)null);
 	}
 	
 	@Override

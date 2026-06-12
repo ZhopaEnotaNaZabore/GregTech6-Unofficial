@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 GregTech-6 Team
+ * Copyright (c) 2019 Gregorius Techneticies
  *
  * This file is part of GregTech.
  *
@@ -93,7 +93,6 @@ public class MultiTileEntityJuicer extends TileEntityBase07Paintable implements 
 		aList.add(Chat.CYAN     + LH.get(LH.RECIPES) + ": " + Chat.WHITE + LH.get(mRecipes.mNameInternal));
 		aList.add(Chat.CYAN     + LH.get(LH.RECIPES_JUICER_USAGE));
 		aList.add(Chat.ORANGE   + LH.get(LH.NO_GUI_CLICK_TO_INTERACT)   + " (" + LH.get(LH.FACE_TOP) + ")");
-		aList.add(Chat.DGRAY    + LH.get(LH.TOOL_TO_DETAIL_MAGNIFYINGGLASS));
 	}
 	
 	@Override
@@ -103,11 +102,6 @@ public class MultiTileEntityJuicer extends TileEntityBase07Paintable implements 
 		if (aTool.equals(TOOL_plunger)) {
 			updateInventory();
 			for (FluidTankGT tTank : mTanks) {long rAmount = GarbageGT.trash(tTank, 1000); if (rAmount > 0) return rAmount;}
-			updateAdjacentInventories();
-		}
-		if (aTool.equals(TOOL_magnifyingglass)) {
-			if (aChatReturn != null) for (FluidTankGT tTank : mTanks) {aChatReturn.add(tTank.content());}
-			return mTanks.length;
 		}
 		return 0;
 	}
@@ -150,10 +144,8 @@ public class MultiTileEntityJuicer extends TileEntityBase07Paintable implements 
 					for (ItemStack tStack : tRecipe.getOutputs()) UT.Inventories.addStackToPlayerInventoryOrDrop(aPlayer, tStack, T);
 					FluidStack[] tOutputFluids = tRecipe.getFluidOutputs();
 					for (int i = 0; i < mTanks.length && i < tOutputFluids.length; i++) mTanks[i].fill(tOutputFluids[i], T);
-					aPlayer.addExhaustion(tRecipe.getAbsoluteTotalPower() / 10000.0F);
+					aPlayer.addExhaustion((tRecipe.mEUt * tRecipe.mDuration) / 10000.0F);
 					UT.Sounds.send(worldObj, SFX.MC_SLIME_BIG, 1.0F, 1.0F, getCoords());
-					updateInventory();
-					updateAdjacentInventories();
 					return T;
 				}
 			}
